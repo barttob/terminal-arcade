@@ -22,11 +22,36 @@ type appModel struct {
 	screen screen
 	cursor int
 
-	width  int
-	height int
-	speed  int
+	terminalWidth  int
+	terminalHeight int
+
+	boardWidth  int
+	boardHeight int
+	speed       int
 
 	game games.SnakeModel
+}
+
+func maxBoardWidth(terminalWidth int) int {
+	const boardChromeWidth = 4
+	const minBoardWidth = 15
+
+	maxWidth := (terminalWidth - boardChromeWidth) / 2
+	if maxWidth < minBoardWidth {
+		return minBoardWidth
+	}
+
+	return maxWidth
+}
+
+func maxBoardHeight(terminalHeight int) int {
+	const boardChromeHeight = 4
+	const minBoardHeight = 10
+	maxHeight := (terminalHeight - boardChromeHeight)
+	if maxHeight < minBoardHeight {
+		return minBoardHeight
+	}
+	return maxHeight
 }
 
 var (
@@ -52,10 +77,10 @@ var (
 
 func initialApp() appModel {
 	return appModel{
-		screen: screenMenu,
-		width:  30,
-		height: 15,
-		speed:  120,
+		screen:      screenMenu,
+		boardWidth:  35,
+		boardHeight: 15,
+		speed:       120,
 	}
 }
 
@@ -64,6 +89,18 @@ func (m appModel) Init() tea.Cmd {
 }
 
 func (m appModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		m.terminalWidth = msg.Width
+		m.terminalHeight = msg.Height
+		if m.boardWidth > maxBoardWidth(m.terminalWidth) {
+			m.boardWidth = maxBoardWidth(m.terminalWidth)
+		}
+		if m.boardHeight > maxBoardHeight(m.terminalHeight) {
+			m.boardHeight = maxBoardHeight(m.terminalHeight)
+		}
+	}
+
 	if m.screen == screenGame {
 		updatedGame, cmd := m.game.Update(msg)
 		m.game = updatedGame.(games.SnakeModel)
@@ -113,7 +150,7 @@ func updateMenu(m appModel, msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "enter":
 			switch m.cursor {
 			case 0:
-				m.game = games.NewSnakeModel(m.width, m.height, m.speed)
+				m.game = games.NewSnakeModel(m.boardWidth, m.boardHeight, m.speed)
 				m.screen = screenGame
 				return m, m.game.Init()
 
@@ -156,12 +193,12 @@ func updateSettings(m appModel, msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "left", "h":
 			switch m.cursor {
 			case 0:
-				if m.width > 15 {
-					m.width -= 5
+				if m.boardWidth > 15 {
+					m.boardWidth -= 5
 				}
 			case 1:
-				if m.height > 10 {
-					m.height -= 5
+				if m.boardHeight > 10 {
+					m.boardHeight -= 5
 				}
 			case 2:
 				if m.speed < 300 {
@@ -172,12 +209,20 @@ func updateSettings(m appModel, msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "right", "l":
 			switch m.cursor {
 			case 0:
-				if m.width < 60 {
-					m.width += 5
+				maxWidth := maxBoardWidth(m.terminalWidth)
+				if m.boardWidth < maxWidth {
+					m.boardWidth += 5
+					if m.boardWidth > maxWidth {
+						m.boardWidth = maxWidth
+					}
 				}
 			case 1:
-				if m.height < 30 {
-					m.height += 5
+				maxHeight := maxBoardHeight(m.terminalHeight)
+				if m.boardHeight < maxHeight {
+					m.boardHeight += 5
+					if m.boardHeight > maxHeight {
+						m.boardHeight = maxHeight
+					}
 				}
 			case 2:
 				if m.speed > 40 {
@@ -199,11 +244,11 @@ func updateSettings(m appModel, msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m appModel) View() string {
 	switch m.screen {
 	case screenMenu:
-		return center(renderMenu(m))
+		return center(renderMenu(m), m.terminalWidth, m.terminalHeight)
 	case screenSettings:
-		return center(renderSettings(m))
+		return center(renderSettings(m), m.terminalWidth, m.terminalHeight)
 	case screenGame:
-		return m.game.View()
+		return center(m.game.View(), m.terminalWidth, m.terminalHeight)
 	default:
 		return ""
 	}
@@ -236,8 +281,8 @@ func renderMenu(m appModel) string {
 
 func renderSettings(m appModel) string {
 	rows := []string{
-		fmt.Sprintf("Board width:  %d", m.width),
-		fmt.Sprintf("Board height: %d", m.height),
+		fmt.Sprintf("Board width:  %d", m.boardWidth),
+		fmt.Sprintf("Board height: %d", m.boardHeight),
 		fmt.Sprintf("Speed:        %dms", m.speed),
 		"Back",
 	}
@@ -264,10 +309,10 @@ func renderSettings(m appModel) string {
 	)
 }
 
-func center(s string) string {
+func center(s string, width, height int) string {
 	return lipgloss.NewStyle().
-		Width(80).
-		Height(24).
+		Width(width).
+		Height(height).
 		Align(lipgloss.Center).
 		AlignVertical(lipgloss.Center).
 		Render(s)

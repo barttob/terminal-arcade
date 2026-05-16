@@ -26,6 +26,9 @@ type SnakeModel struct {
 	score    int
 	gameOver bool
 
+	terminalWidth  int
+	terminalHeight int
+
 	ExitToMenu bool
 }
 
@@ -93,6 +96,12 @@ func snakeTick(speed int) tea.Cmd {
 }
 
 func (m SnakeModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		m.terminalWidth = msg.Width
+		m.terminalHeight = msg.Height
+	}
+
 	if m.gameOver {
 		switch msg := msg.(type) {
 		case tea.KeyMsg:
@@ -204,7 +213,7 @@ func (m SnakeModel) View() string {
 			m.score,
 		)
 
-		return center(gameOverStyle.Render(text))
+		return center(gameOverStyle.Render(text), m.terminalWidth, m.terminalHeight)
 	}
 
 	header := gameTitleStyle.Render(fmt.Sprintf("SNAKE  Score: %d", m.score))
@@ -216,7 +225,7 @@ func (m SnakeModel) View() string {
 		header,
 		board,
 		help,
-	))
+	), m.terminalWidth, m.terminalHeight)
 }
 
 func renderBoard(m SnakeModel) string {
@@ -259,10 +268,10 @@ func containsPoint(points []point, p point) bool {
 	return false
 }
 
-func center(s string) string {
+func center(s string, width, height int) string {
 	return lipgloss.NewStyle().
-		Width(80).
-		Height(24).
+		Width(width).
+		Height(height).
 		Align(lipgloss.Center).
 		AlignVertical(lipgloss.Center).
 		Render(s)
