@@ -11,7 +11,7 @@ func (m appModel) View() string {
 	case StateGameOver:
 		return center("Game Over", m.terminalWidth, m.terminalHeight)
 	case StateSettings:
-		return center("Settings", m.terminalWidth, m.terminalHeight)
+		return center(m.settings.View(), m.terminalWidth, m.terminalHeight)
 	case StateHelp:
 		return center("Help", m.terminalWidth, m.terminalHeight)
 	case StateLobby:

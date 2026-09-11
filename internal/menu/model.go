@@ -1,45 +1,21 @@
 package menu
 
 import (
-	"github.com/barttob/terminal-arcade/internal/engine"
-	"github.com/barttob/terminal-arcade/internal/games/snake"
-	"github.com/barttob/terminal-arcade/internal/games/minesweeper"
+	"github.com/barttob/terminal-arcade/internal/games"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type gameEntry struct {
-	Name    string
-	Factory func() engine.Game
-}
-
 type Model struct {
-	choices []gameEntry
+	choices []games.Entry
 	cursor  int
 
 	terminalWidth  int
 	terminalHeight int
 }
 
-var gameRegistry = []gameEntry{
-	{
-		Name:    "Snake",
-		Factory: snake.New,
-	},
-	{
-		Name:    "Minesweeper",
-		Factory: minesweeper.New,
-	},
-	// {
-	// 	Name: "Tetris",
-	// 	Factory: func() engine.Game {
-	// 		// start Tetris game
-	// 	},
-	// },
-}
-
 func MenuModel() Model {
 	return Model{
-		choices: gameRegistry,
+		choices: games.Registry,
 		cursor:  0,
 	}
 }

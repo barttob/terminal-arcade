@@ -5,12 +5,15 @@ import (
 	"github.com/charmbracelet/lipgloss"
 
 	"github.com/barttob/terminal-arcade/internal/engine"
+	"github.com/barttob/terminal-arcade/internal/games"
 	"github.com/barttob/terminal-arcade/internal/menu"
+	"github.com/barttob/terminal-arcade/internal/settings"
 )
 
 type appModel struct {
-	state AppState
-	menu  menu.Model
+	state    AppState
+	menu     menu.Model
+	settings settings.Model
 	// lobby       lobby.Model
 	currentGame engine.Game
 	//    playerID    engine.PlayerID
@@ -22,8 +25,9 @@ type appModel struct {
 
 func New() appModel {
 	return appModel{
-		state: StateMainMenu,
-		menu:  menu.MenuModel(),
+		state:    StateMainMenu,
+		menu:     menu.MenuModel(),
+		settings: settings.New(settings.Default(), games.SettingsSections()),
 	}
 }
 

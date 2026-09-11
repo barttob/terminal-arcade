@@ -12,8 +12,11 @@ func (m *Model) Update(msg tea.Msg) (engine.Game, tea.Cmd) {
 		return m, nil
 	}
 
-	if key.String() == "r" {
+	switch key.String() {
+	case "r":
 		return m.Reset(), nil
+	case "o":
+		return m, func() tea.Msg { return engine.OpenSettingsMsg{GameID: ID} }
 	}
 	if m.gameOver {
 		return m, nil

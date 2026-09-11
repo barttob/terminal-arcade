@@ -20,6 +20,13 @@ var (
 		Foreground(lipgloss.Color("241")).
 		Align(lipgloss.Center)
 
+	Tab = lipgloss.NewStyle().
+		Foreground(lipgloss.Color("241"))
+	ActiveTab = lipgloss.NewStyle().
+			Bold(true).
+			Underline(true).
+			Foreground(lipgloss.Color("205"))
+
 	GameHeader = lipgloss.NewStyle().
 			Bold(true).
 			Foreground(lipgloss.Color("205"))

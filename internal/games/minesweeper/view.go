@@ -28,11 +28,12 @@ func (m *Model) View() string {
 	var footer string
 	switch {
 	case m.won:
-		footer = styles.Win.Render("You cleared the field!") + styles.Help.Render("  r play again · esc menu")
+		footer = styles.Win.Render("You cleared the field!") + styles.Help.Render("  r play again · o settings · esc menu")
 	case m.gameOver:
-		footer = styles.Lose.Render("Boom!") + styles.Help.Render("  r try again · esc menu")
+		footer = styles.Lose.Render("Boom!") + styles.Help.Render("  r try again · o settings · esc menu")
 	default:
-		footer = styles.Help.Render("arrows/WASD move · space reveal · f flag · r restart · esc menu · q quit")
+		// Two lines keep the hint within an 80-column terminal.
+		footer = styles.Help.Render("arrows/WASD move · space reveal · f flag\no settings · r restart · esc menu · q quit")
 	}
 
 	return lipgloss.JoinVertical(

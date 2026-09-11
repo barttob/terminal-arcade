@@ -9,7 +9,7 @@ func (m Model) View() string {
 	// var b strings.Builder
 
 	options := []string{}
-	for _, entry := range gameRegistry {
+	for _, entry := range m.choices {
 		options = append(options, "Play "+entry.Name)
 	}
 	options = append(options, "Settings", "Exit")

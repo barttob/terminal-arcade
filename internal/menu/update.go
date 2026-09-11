@@ -5,10 +5,6 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type GameSelectedMsg struct {
-	Game engine.Game
-}
-
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
@@ -31,10 +27,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			n := len(m.choices)
 			switch {
 			case m.cursor < n:
-				game := m.choices[m.cursor].Factory()
-				return m, func() tea.Msg { return GameSelectedMsg{Game: game} }
+				id := m.choices[m.cursor].ID
+				return m, func() tea.Msg { return engine.StartGameMsg{GameID: id} }
 			case m.cursor == n:
-				return m, tea.Quit
+				return m, func() tea.Msg { return engine.OpenSettingsMsg{} }
 			case m.cursor == n+1:
 				return m, tea.Quit
 			}
