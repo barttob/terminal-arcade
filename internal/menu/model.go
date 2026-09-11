@@ -3,6 +3,7 @@ package menu
 import (
 	"github.com/barttob/terminal-arcade/internal/engine"
 	"github.com/barttob/terminal-arcade/internal/games/snake"
+	"github.com/barttob/terminal-arcade/internal/games/minesweeper"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -23,6 +24,10 @@ var gameRegistry = []gameEntry{
 	{
 		Name:    "Snake",
 		Factory: snake.New,
+	},
+	{
+		Name:    "Minesweeper",
+		Factory: minesweeper.New,
 	},
 	// {
 	// 	Name: "Tetris",
