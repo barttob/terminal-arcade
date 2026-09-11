@@ -18,9 +18,10 @@ type Entry struct {
 // gets a main menu item and its own tab on the settings screen.
 var Registry = []Entry{
 	{
-		ID:      snake.ID,
-		Name:    "Snake",
-		Factory: func(settings.Settings) engine.Game { return snake.New() },
+		ID:       snake.ID,
+		Name:     "Snake",
+		Factory:  func(s settings.Settings) engine.Game { return snake.New(s.Snake) },
+		Settings: settings.SnakeRows,
 	},
 	{
 		ID:       minesweeper.ID,
@@ -28,13 +29,6 @@ var Registry = []Entry{
 		Factory:  func(s settings.Settings) engine.Game { return minesweeper.New(s.Minesweeper) },
 		Settings: settings.MinesweeperRows,
 	},
-	// {
-	// 	ID:   tetris.ID,
-	// 	Name: "Tetris",
-	// 	Factory: func(s settings.Settings) engine.Game {
-	// 		// start Tetris game
-	// 	},
-	// },
 }
 
 func Find(id string) (Entry, bool) {

@@ -4,15 +4,18 @@ import (
 	"strconv"
 
 	"github.com/barttob/terminal-arcade/internal/games/minesweeper"
+	"github.com/barttob/terminal-arcade/internal/games/snake"
 )
 
 // Settings holds per-game options passed to game factories.
 type Settings struct {
+	Snake       snake.Config
 	Minesweeper minesweeper.Config
 }
 
 func Default() Settings {
 	return Settings{
+		Snake:       snake.DefaultConfig,
 		Minesweeper: minesweeper.DefaultConfig,
 	}
 }
@@ -22,6 +25,43 @@ type Row struct {
 	Label  string
 	Value  func(Settings) string
 	Adjust func(s *Settings, delta int)
+}
+
+var SnakeRows = []Row{
+	{
+		Label: "Speed",
+		Value: func(s Settings) string { return snake.Speeds[s.Snake.Speed].Name },
+		Adjust: func(s *Settings, delta int) {
+			s.Snake.Speed += delta
+			s.Snake = s.Snake.Clamped()
+		},
+	},
+	{
+		Label: "Width",
+		Value: func(s Settings) string { return strconv.Itoa(s.Snake.Width) },
+		Adjust: func(s *Settings, delta int) {
+			s.Snake.Width += delta
+			s.Snake = s.Snake.Clamped()
+		},
+	},
+	{
+		Label: "Height",
+		Value: func(s Settings) string { return strconv.Itoa(s.Snake.Height) },
+		Adjust: func(s *Settings, delta int) {
+			s.Snake.Height += delta
+			s.Snake = s.Snake.Clamped()
+		},
+	},
+	{
+		Label: "Walls",
+		Value: func(s Settings) string {
+			if s.Snake.Walls {
+				return "On"
+			}
+			return "Off (wrap)"
+		},
+		Adjust: func(s *Settings, delta int) { s.Snake.Walls = !s.Snake.Walls },
+	},
 }
 
 var MinesweeperRows = []Row{

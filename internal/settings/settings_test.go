@@ -7,11 +7,12 @@ import (
 
 	"github.com/barttob/terminal-arcade/internal/engine"
 	"github.com/barttob/terminal-arcade/internal/games/minesweeper"
+	"github.com/barttob/terminal-arcade/internal/games/snake"
 )
 
 func testModel() Model {
 	return New(Default(), []Section{
-		{GameID: "snake", Title: "Snake"},
+		{GameID: snake.ID, Title: "Snake", Rows: SnakeRows},
 		{GameID: minesweeper.ID, Title: "Minesweeper", Rows: MinesweeperRows},
 	})
 }
@@ -61,6 +62,24 @@ func TestCyclePresetFromCustom(t *testing.T) {
 	}
 	if got := cyclePreset(custom, 1); got != minesweeper.Presets[0].Config {
 		t.Fatalf("cycling forward from custom = %+v, want first preset", got)
+	}
+}
+
+func TestSnakeRowsClampAndToggle(t *testing.T) {
+	s := Default()
+	speedRow, wallsRow := SnakeRows[0], SnakeRows[3]
+
+	for i := 0; i < len(snake.Speeds)+2; i++ {
+		speedRow.Adjust(&s, 1)
+	}
+	if got, want := speedRow.Value(s), snake.Speeds[len(snake.Speeds)-1].Name; got != want {
+		t.Fatalf("speed = %q, want clamped to %q", got, want)
+	}
+
+	walls := s.Snake.Walls
+	wallsRow.Adjust(&s, -1)
+	if s.Snake.Walls == walls {
+		t.Fatal("adjusting walls didn't toggle them")
 	}
 }
 

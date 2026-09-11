@@ -35,7 +35,7 @@ Bubble Tea (Elm architecture) app in three layers: launcher (`internal/app`, `in
 
 Turn-based games (minesweeper) skip the tick: `Init()` returns `nil`, there's no `step()`, and `r` restart is handled by returning `m.Reset()` from `Update`.
 
-**Shared engine** — `Point`/`Grid`, `Direction` with `DirectionFromKey` (arrows + WASD) and `Opposite()`, `IsCollision`/`ContainsPoint`, `Score`, and `Tick(d)` which wraps `tea.Tick` into a `TickMsg`. Note `Tick` multiplies its argument by `time.Millisecond`, so callers passing an already-scaled `time.Duration` (as snake currently does with `DefaultTickRate`) get a far longer interval than intended.
+**Shared engine** — `Point`/`Grid`, `Direction` with `DirectionFromKey` (arrows + WASD) and `Opposite()`, `IsCollision`/`ContainsPoint`, `Score`, and `Tick(id, d)` which wraps `tea.Tick` into a `TickMsg{ID, Time}`. A tick-based game takes an ID from `engine.NewTickID()` at construction and ignores `TickMsg`s with any other ID; otherwise a tick still in flight from a restarted or abandoned game would start a second tick chain and double the speed. Snake shows the pattern: `Init` arms the first tick, each own tick re-arms, and pausing or game over lets the chain lapse. Unpausing takes a fresh ID before re-arming, so a tick still in flight from before the pause can't start a second chain.
 
 **Styling** — all lipgloss styles live in [internal/styles/styles.go](internal/styles/styles.go). Do not define colors inside game packages.
 
@@ -43,14 +43,14 @@ Turn-based games (minesweeper) skip the tick: `Init()` returns `nil`, there's no
 
 **Message flow** — navigation goes through two messages in [engine/game.go](internal/engine/game.go), which the menu, the settings screen and games all emit:
 - `engine.StartGameMsg{GameID}` → `app.startGame` looks the ID up in the registry, builds it with `Factory(m.settings.Values())`, and returns `Init()`.
-- `engine.OpenSettingsMsg{GameID}` → switches to `StateSettings` with `settings.Focus(GameID)` (an empty ID keeps the last tab). Minesweeper sends this on `o`.
+- `engine.OpenSettingsMsg{GameID}` → switches to `StateSettings` with `settings.Focus(GameID)` (an empty ID keeps the last tab). Both games send this on `o`.
 
-While playing, `app.Update` forwards *every* message (keys, `TickMsg`, `WindowSizeMsg`) to `currentGame.Update`, so games must type-switch rather than assert. `q`/`ctrl+c` quit globally before dispatch. `esc` is handled in `app.Update`: from a game it drops the game and returns to the menu. From settings it resumes `currentGame` if settings were opened from a game, otherwise it returns to the menu. Messages aren't delivered to a game while settings are open, so a tick-based game will need to re-arm its tick on resume.
+While playing, `app.Update` forwards *every* message (keys, `TickMsg`, `WindowSizeMsg`) to `currentGame.Update`, so games must type-switch rather than assert. `q`/`ctrl+c` quit globally before dispatch. `esc` is handled in `app.Update`: from a game it drops the game and returns to the menu. From settings it resumes `currentGame` if settings were opened from a game, otherwise it returns to the menu. Messages aren't delivered to a game while settings are open, and the app sends nothing on resume, so a tick-based game should pause itself before emitting `OpenSettingsMsg` (as snake does) and re-arm when the player unpauses.
 
 ## Current state
 
 - Minesweeper is playable, with Beginner/Intermediate/Expert/custom boards configurable from Settings. Mines are placed on the first reveal, so the opening is always safe.
-- `snake.step()` and `snake.View()` are stubs, and snake never re-issues its tick.
+- Snake is playable, with speed (Slow/Normal/Fast/Insane), board size up to 38×19 (the most that fits 80×24), and walls on/off (off wraps around) configurable from Settings. Key presses are queued (up to 3) and applied one per tick, so fast turns aren't dropped and can't reverse the snake into itself.
 
 ## Design doc
 

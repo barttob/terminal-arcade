@@ -39,6 +39,27 @@ var (
 	Lose = lipgloss.NewStyle().
 		Bold(true).
 		Foreground(lipgloss.Color("196"))
+	Paused = lipgloss.NewStyle().
+		Bold(true).
+		Foreground(lipgloss.Color("214"))
+
+	// Snake
+	// SnakeOpenBoard marks a board whose edges wrap around.
+	SnakeOpenBoard = Board.Border(lipgloss.Border{
+		Top: "┄", Bottom: "┄", Left: "┆", Right: "┆",
+		TopLeft: "╭", TopRight: "╮", BottomLeft: "╰", BottomRight: "╯",
+	})
+	SnakeHead = lipgloss.NewStyle().
+			Bold(true).
+			Foreground(lipgloss.Color("120"))
+	SnakeBody = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("34"))
+	SnakeDead = lipgloss.NewStyle().
+			Bold(true).
+			Foreground(lipgloss.Color("196"))
+	SnakeFood = lipgloss.NewStyle().
+			Bold(true).
+			Foreground(lipgloss.Color("203"))
 
 	// Minesweeper
 	MineCursor = lipgloss.NewStyle().
