@@ -7,7 +7,12 @@ import (
 )
 
 func (m *Model) Update(msg tea.Msg) (engine.Game, tea.Cmd) {
-	direction, ok := engine.DirectionFromKey(msg.(tea.KeyMsg).String())
+	key, ok := msg.(tea.KeyMsg)
+	if !ok {
+		return m, nil
+	}
+
+	direction, ok := engine.DirectionFromKey(key.String())
 	if ok {
 		if direction != m.direction.Opposite() {
 			m.direction = direction

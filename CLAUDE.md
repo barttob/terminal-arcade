@@ -8,10 +8,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 go run ./cmd/arcade      # run the arcade locally (alt-screen TUI)
 go build ./...           # compile everything
 go vet ./...             # vet
-gofmt -l .               # list unformatted files
-go test ./...            # no tests exist yet
-go test ./internal/engine -run TestName   # single test, once tests exist
+gofmt -l .               # list unformatted files (see CRLF note below)
+go test ./...
+go test ./internal/games/minesweeper -run TestFlagBlocksReveal   # single test
 ```
+
+The repo is checked out with `core.autocrlf=true`, so `gofmt -l` reports nearly every file purely because of CRLF endings. To find real formatting problems, strip `\r` first (e.g. `tr -d '\r' < file | gofmt -d`).
 
 There is no Makefile (the design doc proposes one). `go.mod` currently marks every dependency `// indirect`; `go mod tidy` will correct that once the direct imports settle.
 
@@ -31,18 +33,18 @@ Bubble Tea (Elm architecture) app in three layers: launcher (`internal/app`, `in
 - `view.go` — rendering only
 - `<game>.go` — the `engine.Game` interface methods, package consts (`ID`, `DefaultWidth`, `DefaultHeight`, `DefaultTickRate`), and `New() engine.Game`
 
-**Shared engine** — `Point`/`Grid`, `Direction` with `DirectionFromKey` (arrows + WASD) and `Opposite()`, `IsCollision`/`ContainsPoint`, `Score`, and `Tick(d)` which wraps `tea.Tick` into a `TickMsg`. Note `Tick` multiplies its argument by `time.Millisecond`, so callers passing an already-scaled `time.Duration` (as both games currently do with `DefaultTickRate`) get a far longer interval than intended.
+Turn-based games (minesweeper) skip the tick: `Init()` returns `nil`, there's no `step()`, and `r` restart is handled by returning `m.Reset()` from `Update`.
+
+**Shared engine** — `Point`/`Grid`, `Direction` with `DirectionFromKey` (arrows + WASD) and `Opposite()`, `IsCollision`/`ContainsPoint`, `Score`, and `Tick(d)` which wraps `tea.Tick` into a `TickMsg`. Note `Tick` multiplies its argument by `time.Millisecond`, so callers passing an already-scaled `time.Duration` (as snake currently does with `DefaultTickRate`) get a far longer interval than intended.
 
 **Styling** — all lipgloss styles live in [internal/styles/styles.go](internal/styles/styles.go). Do not define colors inside game packages.
 
-**Message flow** — menu emits `menu.GameSelectedMsg{Game}`; `app.Update` catches it, stores `currentGame`, sets `StatePlaying`, and returns `currentGame.Init()`.
+**Message flow** — menu emits `menu.GameSelectedMsg{Game}`; `app.Update` catches it, stores `currentGame`, sets `StatePlaying`, and returns `currentGame.Init()`. While playing, `app.Update` forwards *every* message (keys, `TickMsg`, `WindowSizeMsg`) to `currentGame.Update`, so games must type-switch rather than assert. `q`/`ctrl+c` quit globally before dispatch; `esc` drops the game and returns to the menu.
 
 ## Current state
 
-Early scaffolding. Wiring gaps to be aware of before touching game code:
-- `app.Update` never dispatches to `m.currentGame.Update`, so a started game receives neither keys nor ticks.
-- `snake.Update` unconditionally type-asserts `msg.(tea.KeyMsg)` and will panic on any other message once dispatch is hooked up.
-- `snake.step()` and `snake.View()` are stubs; `minesweeper` is a skeleton with no board.
+- Minesweeper is playable (16×16, 40 mines, mines placed on first reveal so the opening is safe).
+- `snake.step()` and `snake.View()` are stubs, and snake never re-issues its tick.
 - `menu` cursor bound is `len(m.choices)+1` (off by one past the last selectable item).
 
 ## Design doc

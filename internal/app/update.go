@@ -30,5 +30,17 @@ func (m appModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, cmd
 	}
 
+	if m.state == StatePlaying {
+		if key, ok := msg.(tea.KeyMsg); ok && key.String() == "esc" {
+			m.currentGame = nil
+			m.state = StateMainMenu
+			return m, nil
+		}
+
+		updatedGame, cmd := m.currentGame.Update(msg)
+		m.currentGame = updatedGame
+		return m, cmd
+	}
+
 	return m, nil
 }
