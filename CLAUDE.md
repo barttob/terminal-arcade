@@ -51,6 +51,7 @@ While playing, `app.Update` forwards *every* message (keys, `TickMsg`, `WindowSi
 
 - Minesweeper is playable, with Beginner/Intermediate/Expert/custom boards configurable from Settings. Mines are placed on the first reveal, so the opening is always safe.
 - Snake is playable, with speed (Slow/Normal/Fast/Insane), board size up to 38×19 (the most that fits 80×24), and walls on/off (off wraps around) configurable from Settings. Key presses are queued (up to 3) and applied one per tick, so fast turns aren't dropped and can't reverse the snake into itself.
+- Flappy Bird is playable on a fixed 60×18 board, with pipe speed (Slow/Normal/Fast) and gap size (Wide/Normal/Narrow) configurable from Settings. It's tick-based but arms no tick in `Init()`: the bird hovers until the first flap starts the chain. Bird height and pipe positions are floats stepped at a fixed ~30 fps; collisions use the drawn cells. The best score survives `r` restarts but not leaving the game.
 
 ## Design doc
 

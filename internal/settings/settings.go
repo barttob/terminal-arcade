@@ -3,6 +3,7 @@ package settings
 import (
 	"strconv"
 
+	"github.com/barttob/terminal-arcade/internal/games/flappy"
 	"github.com/barttob/terminal-arcade/internal/games/minesweeper"
 	"github.com/barttob/terminal-arcade/internal/games/snake"
 )
@@ -11,12 +12,14 @@ import (
 type Settings struct {
 	Snake       snake.Config
 	Minesweeper minesweeper.Config
+	Flappy      flappy.Config
 }
 
 func Default() Settings {
 	return Settings{
 		Snake:       snake.DefaultConfig,
 		Minesweeper: minesweeper.DefaultConfig,
+		Flappy:      flappy.DefaultConfig,
 	}
 }
 
@@ -61,6 +64,25 @@ var SnakeRows = []Row{
 			return "Off (wrap)"
 		},
 		Adjust: func(s *Settings, delta int) { s.Snake.Walls = !s.Snake.Walls },
+	},
+}
+
+var FlappyRows = []Row{
+	{
+		Label: "Speed",
+		Value: func(s Settings) string { return flappy.Speeds[s.Flappy.Speed].Name },
+		Adjust: func(s *Settings, delta int) {
+			s.Flappy.Speed += delta
+			s.Flappy = s.Flappy.Clamped()
+		},
+	},
+	{
+		Label: "Gap",
+		Value: func(s Settings) string { return flappy.Gaps[s.Flappy.Gap].Name },
+		Adjust: func(s *Settings, delta int) {
+			s.Flappy.Gap += delta
+			s.Flappy = s.Flappy.Clamped()
+		},
 	},
 }
 

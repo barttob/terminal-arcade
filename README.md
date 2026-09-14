@@ -11,8 +11,9 @@ Start the app, pick a game from the menu, play, and return to the menu without r
 
 | Game        | State                                                                    |
 | ----------- | ------------------------------------------------------------------------ |
+| Snake       | ✅ Playable: four speeds, board size up to 38×19, walls on or wrap-around |
 | Minesweeper | ✅ Playable: Beginner/Intermediate/Expert presets and custom boards       |
-| Snake       | 🚧 Listed in the menu but not playable yet                               |
+| Flappy Bird | ✅ Playable: adjustable pipe speed and gap size                           |
 
 ## Getting started
 
@@ -43,7 +44,9 @@ go build -o arcade ./cmd/arcade    # on Windows: go build -o arcade.exe ./cmd/ar
 | Everywhere  | `q` / `ctrl+c` quit                                                                       |
 | Main menu   | `↑`/`↓` (or `k`/`j`) move · `enter` select                                                |
 | Settings    | `tab` / `shift+tab` switch game · `↑`/`↓` move · `←`/`→` change · `enter` play · `esc` back |
+| Snake       | arrows/WASD move · `p` pause · `o` settings · `r` restart · `esc` menu                    |
 | Minesweeper | arrows/WASD move · `space` reveal · `f` flag · `o` settings · `r` restart · `esc` menu    |
+| Flappy Bird | `space`/`↑`/`w` flap · `p` pause · `o` settings · `r` restart · `esc` menu                |
 
 ## Roadmap
 
@@ -52,7 +55,8 @@ A rough plan. The full design and phase breakdown is in [terminal_arcade_collect
 - [x] **Foundation**: app shell, main menu, shared styles, shared engine (grid, input, collision, ticks)
 - [x] **Minesweeper**: first playable game
 - [x] **Settings**: per-game settings tabs
-- [ ] **Snake**: finish movement, collision and rendering
+- [x] **Snake**: movement with queued turns, collision, speed/size/walls settings
+- [x] **Flappy Bird**: gravity and flap physics, scrolling pipes, speed/gap settings
 - [ ] **Core screens**: pause, game-over and help screens
 - [ ] **More games**: Pong, Breakout, Tetris, Space Invaders, 2048, and others
 - [ ] **Persistence**: save settings and high scores between runs

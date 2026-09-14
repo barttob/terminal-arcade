@@ -2,6 +2,7 @@ package games
 
 import (
 	"github.com/barttob/terminal-arcade/internal/engine"
+	"github.com/barttob/terminal-arcade/internal/games/flappy"
 	"github.com/barttob/terminal-arcade/internal/games/minesweeper"
 	"github.com/barttob/terminal-arcade/internal/games/snake"
 	"github.com/barttob/terminal-arcade/internal/settings"
@@ -28,6 +29,12 @@ var Registry = []Entry{
 		Name:     "Minesweeper",
 		Factory:  func(s settings.Settings) engine.Game { return minesweeper.New(s.Minesweeper) },
 		Settings: settings.MinesweeperRows,
+	},
+	{
+		ID:       flappy.ID,
+		Name:     "Flappy Bird",
+		Factory:  func(s settings.Settings) engine.Game { return flappy.New(s.Flappy) },
+		Settings: settings.FlappyRows,
 	},
 }
 

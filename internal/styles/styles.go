@@ -61,6 +61,16 @@ var (
 			Bold(true).
 			Foreground(lipgloss.Color("203"))
 
+	// Flappy Bird
+	FlappyBird = lipgloss.NewStyle().
+			Bold(true).
+			Foreground(lipgloss.Color("220"))
+	FlappyDead = lipgloss.NewStyle().
+			Bold(true).
+			Foreground(lipgloss.Color("196"))
+	FlappyPipe = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("34"))
+
 	// Minesweeper
 	MineCursor = lipgloss.NewStyle().
 			Bold(true).
